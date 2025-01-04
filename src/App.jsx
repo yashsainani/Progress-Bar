@@ -1,35 +1,40 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import styles from './App.module.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [percentage, setPercentage] = useState(0);
+  let timerId;
+
+  const progressBar = () => {
+    timerId = setInterval(() => {
+      setPercentage((prevPercentage) => {
+        const newPercentage = prevPercentage + 1;
+
+        if (newPercentage === 100) {
+          clearInterval(timerId);
+        }
+
+        return newPercentage;
+      })
+    }, 100);
+  };
+
+  useEffect(() => {
+    progressBar();
+    
+    return () => {
+      clearInterval(timerId);
+    }
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className={styles.container}>
+      <div className={styles.bar} style={{'--leftD' : `-${100 - percentage}%`, '--colorD' : percentage > 51 ? 'whitesmoke' : 'black'}}>
+        <p>{percentage}%</p>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      <h2>{percentage === 100 ? 'Completed!' : 'Loading.....'}</h2>
+    </div>
   )
 }
 
-export default App
+export default App;
